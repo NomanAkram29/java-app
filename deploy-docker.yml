@@ -2,6 +2,9 @@
 - hosts: dev
   become: True
   tasks:
+    - name: Test SSH Connection
+      ping:
+      
     - name: Install Python pip
       apt:
         name: python-pip
@@ -19,13 +22,6 @@
       pip:
         name: docker-py
         state: present
-    - name: Check SSH Connection
-      hosts: your_remote_host  # Replace with the name or group of your remote host(s) from your Ansible inventory
-      gather_facts: no
-      tasks:
-        - name: Test SSH Connection
-          ping:
-
     - name: Start the Container
       docker_container:
         name: java-app
