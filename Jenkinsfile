@@ -1,44 +1,43 @@
 pipeline{
     agent any
     tools {
-      maven 'maven3'
+      maven 'Digian-Maven'
     }
     environment {
       DOCKER_TAG = getVersion()
     }
     stages{
-        stage('SCM'){
+        stage('Java SCM'){
             steps{
-                git credentialsId: 'github', 
-                    url: 'https://github.com/javahometech/dockeransiblejenkins'
+                git branch: 'main', credentialsId: 'Digian-GitHub', url: 'https://github.com/NomanAkram29/java-app.git'
             }
         }
         
-        stage('Maven Build'){
+        stage('Java Maven Build'){
             steps{
                 sh "mvn clean package"
             }
         }
         
-        stage('Docker Build'){
+        stage('Java Docker Build'){
             steps{
-                sh "docker build . -t kammana/hariapp:${DOCKER_TAG} "
+                sh "docker build . -t nomana29/java-app:${DOCKER_TAG}"
             }
         }
         
-        stage('DockerHub Push'){
+        stage('Java DockerHub Push'){
             steps{
-                withCredentials([string(credentialsId: 'docker-hub', variable: 'dockerHubPwd')]) {
-                    sh "docker login -u kammana -p ${dockerHubPwd}"
+                withCredentials([string(credentialsId: 'Digian-DockerHub', variable: 'DockerHubPWD')]) {
+                    sh "docker login -u nomana29 -p ${DockerHubPWD}"
                 }
                 
-                sh "docker push kammana/hariapp:${DOCKER_TAG} "
+                sh "docker push nomana29/java-app:${DOCKER_TAG} "
             }
         }
         
         stage('Docker Deploy'){
             steps{
-              ansiblePlaybook credentialsId: 'dev-server', disableHostKeyChecking: true, extras: "-e DOCKER_TAG=${DOCKER_TAG}", installation: 'ansible', inventory: 'dev.inv', playbook: 'deploy-docker.yml'
+              ansiblePlaybook credentialsId: 'Digian-SSH', disableHostKeyChecking: true, extras: "-e DOCKER_TAG=${DOCKER_TAG}", installation: 'ansible', inventory: 'dev.inv', playbook: 'deploy-docker.yml'
             }
         }
     }

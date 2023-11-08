@@ -19,9 +19,16 @@
       pip:
         name: docker-py
         state: present
+    - name: Check SSH Connection
+      hosts: your_remote_host  # Replace with the name or group of your remote host(s) from your Ansible inventory
+      gather_facts: no
+      tasks:
+        - name: Test SSH Connection
+          ping:
+
     - name: Start the Container
       docker_container:
-        name: hariapp
+        name: java-app
         image: "nomana29/java-app:{{DOCKER_TAG}}"
         state: started
         published_ports:
